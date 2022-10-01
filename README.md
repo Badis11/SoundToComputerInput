@@ -1,4 +1,4 @@
-#It's Still in development and doesn't have the main function implemented
+# It's Still in development and doesn't have the main function implemented
 
 # SoundToComputerInput
  This program analyzes sound from microphone and changes it to computer input to act as keyboard. Currently in development
