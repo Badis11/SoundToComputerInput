@@ -2,6 +2,8 @@ import pyaudio
 import time
 import wave
 import numpy as np
+from scipy.fft import *
+from scipy.io import wavfile
 
 def playback():
     WIDTH = 2
@@ -70,9 +72,6 @@ def record(seconds):
     wf.close()
 
 def play(file):
-    import pyaudio
-    import wave
-    import sys
 
     CHUNK = 1024
     file=file+'.wav'
@@ -108,59 +107,68 @@ def analyze():
 
     p = pyaudio.PyAudio()
 
-    stream = p.open(format=
-                    p.get_format_from_width(WIDTH),
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    output=True)
-    stream.start_stream()
+    def freq(file, start_time, end_time):
 
-    chunk = 2048
-
-    # open up a wave
-    wf = wave.open(stream, 'rb')
-    swidth = wf.getsampwidth()
-    RATE = wf.getframerate()
-    # use a Blackman window
-    window = np.blackman(chunk)
-    # open stream
-    p = pyaudio.PyAudio()
-    stream = p.open(format=
-                    p.get_format_from_width(wf.getsampwidth()),
-                    channels=wf.getnchannels(),
-                    rate=RATE,
-                    output=True)
-
-    # read some data
-    data = wf.readframes(chunk)
-    # play stream and find the frequency of each chunk
-    while len(data) == chunk * swidth:
-        # write data out to the audio stream
-        stream.write(data)
-        # unpack the data and times by the hamming window
-        indata = np.array(wave.struct.unpack("%dh" % (len(data) / swidth), \
-                                             data)) * window
-        # Take the fft and square each value
-        fftData = abs(np.fft.rfft(indata)) ** 2
-        # find the maximum
-        which = fftData[1:].argmax() + 1
-        # use quadratic interpolation around the max
-        if which != len(fftData) - 1:
-            y0, y1, y2 = np.log(fftData[which - 1:which + 2:])
-            x1 = (y2 - y0) * .5 / (2 * y1 - y2 - y0)
-            # find the frequency and output it
-            thefreq = (which + x1) * RATE / chunk
-            print("The freq is %f Hz." % (thefreq))
+        # Open the file and convert to mono
+        sr, data = wavfile.read(file)
+        if data.ndim > 1:
+            data = data[:, 0]
         else:
-            thefreq = which * RATE / chunk
-            print("The freq is %f Hz." % (thefreq))
-        # read some more data
-        data = wf.readframes(chunk)
-    if data:
-        stream.write(data)
-    stream.close()
-    p.terminate()
+            pass
+
+        # Return a slice of the data from start_time to end_time
+        dataToRead = data[int(start_time * sr / 1000): int(end_time * sr / 1000) + 1]
+
+        # Fourier Transform
+        N = len(dataToRead)
+        yf = rfft(dataToRead)
+        xf = rfftfreq(N, 1 / sr)
+
+        # Uncomment these to see the frequency spectrum as a plot
+        # plt.plot(xf, np.abs(yf))
+        # plt.show()
+
+        # Get the most dominant frequency and return it
+        idx = np.argmax(np.abs(yf))
+        freq = xf[idx]
+        return freq
+
+    while True:
+        CHUNK = 1024
+        FORMAT = pyaudio.paInt16
+        CHANNELS = 1
+        RATE = 44100
+        RECORD_SECONDS = 0.05
+        WAVE_OUTPUT_FILENAME = "analyze.wav"
+
+        p = pyaudio.PyAudio()
+
+        stream = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK)
+
+
+        frames = []
+
+        for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+            data = stream.read(CHUNK)
+            frames.append(data)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(RATE)
+        wf.writeframes(b''.join(frames))
+        wf.close()
+
+        print(freq("analyze.wav", 0, 50))
+
 
 
 while True:
