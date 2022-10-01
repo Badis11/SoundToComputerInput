@@ -69,6 +69,38 @@ def record(seconds):
     wf.writeframes(b''.join(frames))
     wf.close()
 
+def play(file):
+    import pyaudio
+    import wave
+    import sys
+
+    CHUNK = 1024
+    file=file+'.wav'
+    wf = wave.open(file, 'rb')
+
+    p = pyaudio.PyAudio()
+
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                    channels=wf.getnchannels(),
+                    rate=wf.getframerate(),
+                    output=True)
+
+    data = wf.readframes(CHUNK)
+
+    print("to end mid-file you need to rerun script")
+
+    while len(data):
+        stream.write(data)
+        data = wf.readframes(CHUNK)
+        stop=0
+        if stop == "stop":
+            stream.stop_stream()
+            break
+    stream.stop_stream()
+    stream.close()
+
+    p.terminate()
+
 def analyze():
     WIDTH = 2
     CHANNELS = 2
@@ -132,8 +164,7 @@ def analyze():
 
 
 while True:
-    print(dict.getMicrophoneList())
-    print("type 1 for playback, 2 for recording, 3 for analyzing audio or stop to stop")
+    print("type 1 for playback, 2 for recording, 3 for playing a wav file, 4 for analyzing audio or stop to stop")
     x=input()
     if x=="1":
         playback()
@@ -142,6 +173,10 @@ while True:
         y =int(input())
         record(y)
     if x=="3":
+        print("which .wav file (don't type the extension)")
+        file=input()
+        play(file)
+    if x=="4":
         analyze()
     if x=="stop":
         print("stopping")

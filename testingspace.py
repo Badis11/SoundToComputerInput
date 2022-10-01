@@ -70,7 +70,7 @@ from apu import APU
 apu = APU()
 print(apu.getMicrophoneList())
 print(apu.test())'''
-
+'''
 #https://fazals.ddns.net/spectrum-analyser-part-1/
 
 import numpy as np #importing Numpy with an alias np
@@ -105,12 +105,36 @@ ax.set_ylim(-32000,32000)
 ax.ser_xlim = (0,CHUNK)
 ax1.set_xlim(20,RATE/2)
 ax1.set_ylim(0,1)
-fig.show()
 
 while 1:
     data = stream.read(CHUNK)
     dataInt = struct.unpack(str(CHUNK) + 'h', data)
-    line.set_ydata(dataInt)
-    line_fft.set_ydata(np.abs(np.fft.fft(dataInt))*2/(11000*CHUNK))
-    fig.canvas.draw()
-    fig.canvas.flush_events()
+    print(x_fft)'''
+
+import pyaudio
+import wave
+import sys
+
+CHUNK = 1024
+
+
+
+wf = wave.open("aotkq.wav", 'rb')
+
+p = pyaudio.PyAudio()
+
+stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                channels=wf.getnchannels(),
+                rate=wf.getframerate(),
+                output=True)
+
+data = wf.readframes(CHUNK)
+
+while len(data):
+    stream.write(data)
+    data = wf.readframes(CHUNK)
+
+stream.stop_stream()
+stream.close()
+
+p.terminate()
