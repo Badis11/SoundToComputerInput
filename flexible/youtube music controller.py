@@ -1,3 +1,5 @@
+# This doesn't relly on other files in this folder. It can be used independently from the rest of the files.
+
 import pyaudio
 import wave
 import numpy as np
@@ -90,67 +92,21 @@ def con():
             print(note)
         elif analyze() < 540:
             note = "C"
-            pyautogui.keyDown('a')
-            sleep(0.2)
-            pyautogui.keyUp('a')
+            pyautogui.press("space") 
             print(note)
-        elif analyze() < 565:
-            note = "C#"
-            pyautogui.keyDown('w')
             sleep(0.2)
-            pyautogui.keyUp('w')
-            print(note)
         elif analyze() < 610:
             note = "D"
-            pyautogui.keyDown('d')
-            sleep(0.2)
-            pyautogui.keyUp('d')
+            pyautogui.keyDown('k')
+            pyautogui.keyUp('k')
             print(note)
-        elif analyze() < 640:
-            note = "D#"
-            pyautogui.keyDown('s')
-            sleep(0.2)
-            pyautogui.keyUp('s')
-            print(note)
+            sleep(0.2)  
         elif analyze() < 675:
             note = "E"
-            pyautogui.press("space")
+            pyautogui.keyDown('j')
+            pyautogui.keyUp('j')
             print(note)
-        elif analyze() < 710:
-            a = pyautogui.position()
-            x = a[0]
-            y = a[1]
-            pyautogui.moveTo(x-50,y)
-            note = "F"
-            print(note)
-        elif analyze() < 750:
-            pyautogui.move(0,-50)
-            note = "F#"
-            print(note)
-        elif analyze() < 810:
-            pyautogui.move(50,0)
-            note = "G"
-            print(note)
-        elif analyze() < 860:
-            pyautogui.move(0,-50)
-            note = "G#"
-            print(note)
-        elif analyze() < 900:
-            note = "A"
-            pyautogui.click(button='left')
-            print(note)
-        elif analyze() < 950:
-            note = "A#"
-            if scroll <2:
-                scroll+=1
-                pyautogui.scroll(1)
-            else:
-                scroll-=1
-                pyautogui.scroll(-1)
-            print(note, scroll)
+            sleep(0.2)
         else:
-            note = "B"
-            pyautogui.press('ctrlleft')
-            print(note)
-
+             pass
 con()

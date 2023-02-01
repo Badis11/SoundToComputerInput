@@ -173,7 +173,7 @@ while True:
         y =int(input())
         record(y)
     if x=="3":
-        print("which .wav file (don't type the extension)")
+        print("which .wav file (You need to provide entire path without the extension (e.g. C:Users/song))")
         file=input()
         play(file)
     if x=="4":

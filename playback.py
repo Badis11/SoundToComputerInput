@@ -1,3 +1,5 @@
+# This should work as a module
+
 import pyaudio
 import time
 

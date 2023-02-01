@@ -1,3 +1,5 @@
+# This doesn't relly on other files in this folder. It can be used independently from the rest of the files.
+
 import pyaudio
 import wave
 import numpy as np
@@ -5,6 +7,7 @@ from scipy.fft import *
 from scipy.io import wavfile
 import math
 import pyautogui
+from time import sleep
 
 scale_downcut = 500
 scale_upcut = 1000
@@ -80,43 +83,76 @@ def analyze():
         return math.trunc(eq)
         #print(math.trunc(eq))
 
-while True:
-    if analyze()<500:
-         note = 0
-         print(note)
-    elif analyze()<540:
-         note = "C"
-         print(note)
-    elif analyze()<565:
-        note = "C#"
-        print(note)
-    elif analyze()<610:
-        note = "D"
-        print(note)
-    elif analyze()<640:
-        note = "D#"
-        print(note)
-    elif analyze()<675:
-        note = "E"
-        print(note)
-    elif analyze()<710:
-        note = "F"
-        print(note)
-    elif analyze()<750:
-        note = "F#"
-        print(note)
-    elif analyze()<810:
-        note = "G"
-        print(note)
-    elif analyze()<860:
-        note = "G#"
-        print(note)
-    elif analyze()<900:
-        note = "A"
-        print(note)
-    elif analyze()<950:
-        note = "A#"
-        print(note)
-    elif analyze()<1200:
-        note = "B"
-        print(note)
+
+def con():
+    scroll=0
+    while True:
+        if analyze() < 500:
+            note = 0
+            print(note)
+        elif analyze() < 540:
+            note = "C"
+            pyautogui.keyDown('a')
+            sleep(0.2)
+            pyautogui.keyUp('a')
+            print(note)
+        elif analyze() < 565:
+            note = "C#"
+            pyautogui.keyDown('w')
+            sleep(0.2)
+            pyautogui.keyUp('w')
+            print(note)
+        elif analyze() < 610:
+            note = "D"
+            pyautogui.keyDown('d')
+            sleep(0.2)
+            pyautogui.keyUp('d')
+            print(note)
+        elif analyze() < 640:
+            note = "D#"
+            pyautogui.keyDown('s')
+            sleep(0.2)
+            pyautogui.keyUp('s')
+            print(note)
+        elif analyze() < 675:
+            note = "E"
+            pyautogui.press("space")
+            print(note)
+        elif analyze() < 710:
+            a = pyautogui.position()
+            x = a[0]
+            y = a[1]
+            pyautogui.moveTo(x-50,y)
+            note = "F"
+            print(note)
+        elif analyze() < 750:
+            pyautogui.move(0,-50)
+            note = "F#"
+            print(note)
+        elif analyze() < 810:
+            pyautogui.move(50,0)
+            note = "G"
+            print(note)
+        elif analyze() < 860:
+            pyautogui.move(0,-50)
+            note = "G#"
+            print(note)
+        elif analyze() < 900:
+            note = "A"
+            pyautogui.click(button='left')
+            print(note)
+        elif analyze() < 950:
+            note = "A#"
+            if scroll <2:
+                scroll+=1
+                pyautogui.scroll(1)
+            else:
+                scroll-=1
+                pyautogui.scroll(-1)
+            print(note, scroll)
+        else:
+            note = "B"
+            pyautogui.press('ctrlleft')
+            print(note)
+
+con()

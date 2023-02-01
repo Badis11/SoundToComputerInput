@@ -1,10 +1,13 @@
-# This should work as a module
-
 import pyaudio
 import wave
 import numpy as np
 from scipy.fft import *
 from scipy.io import wavfile
+import math
+import pyautogui
+
+scale_downcut = 500
+scale_upcut = 1000
 
 def analyze():
     WIDTH = 2
@@ -65,4 +68,55 @@ def analyze():
         wf.writeframes(b''.join(frames))
         wf.close()
 
-        print(freq("analyze.wav", 0, 50))
+        #print(math.trunc(freq("analyze.wav", 0, 50)))
+        eq=math.trunc(freq("analyze.wav", 0, 50))
+        if eq==0:
+            pass
+        if eq <= scale_downcut:
+            eq = eq*2
+        if eq >= scale_upcut:
+            eq = eq/2
+
+        return math.trunc(eq)
+        #print(math.trunc(eq))
+
+while True:
+    if analyze()<500:
+         note = 0
+         print(note)
+    elif analyze()<540:
+         note = "C"
+         print(note)
+    elif analyze()<565:
+        note = "C#"
+        print(note)
+    elif analyze()<610:
+        note = "D"
+        print(note)
+    elif analyze()<640:
+        note = "D#"
+        print(note)
+    elif analyze()<675:
+        note = "E"
+        print(note)
+    elif analyze()<710:
+        note = "F"
+        print(note)
+    elif analyze()<750:
+        note = "F#"
+        print(note)
+    elif analyze()<810:
+        note = "G"
+        print(note)
+    elif analyze()<860:
+        note = "G#"
+        print(note)
+    elif analyze()<900:
+        note = "A"
+        print(note)
+    elif analyze()<950:
+        note = "A#"
+        print(note)
+    elif analyze()<1200:
+        note = "B"
+        print(note)
